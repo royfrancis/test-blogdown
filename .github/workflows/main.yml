@@ -22,7 +22,7 @@ jobs:
       - name: Install linux dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install libxml2-dev libssl-dev libcurl4-openssl-dev libudunits2-dev libopenblas-base hugo
+          sudo apt-get install libxml2-dev libssl-dev libcurl4-openssl-dev libudunits2-dev libopenblas-base
       - name: Define variables
         run: |
           echo "path_repo=$(pwd)" >> $GITHUB_ENV
@@ -54,22 +54,23 @@ jobs:
           Rscript -e 'install.packages(c("blogdown"))'
           Rscript -e 'installed.packages()'
           echo ""
+          echo "R directory size:"
+          du -sh ${{ env.R_LIBS_USER }}
+      - name: Check hugo status
+        run: |
+          Rscript -e 'blogdown::install_hugo()'
           Rscript -e 'blogdown::config_Rprofile()'
-          echo ""
           Rscript -e 'blogdown::check_hugo()'
           echo ""
           Rscript -e 'blogdown::check_site()'
-          echo ""
-          echo "R directory size:"
-          du -sh ${{ env.R_LIBS_USER }}
-      - name: Render site, pull repo, copy folder, create index, push repo
+      - name: Build site, pull repo, copy folder contents, push repo
         run: |
           # Add git info
           git config --global user.email "do_not_email@example.com"
           git config --global user.name "gh_action"
 
           # Render website
-          echo "Rendering website ..."
+          echo "Building website ..."
           Rscript -e "blogdown::build_site()"
 
           # List folder contents
@@ -81,16 +82,8 @@ jobs:
           # Clone gh-pages branch and remove old directories with same name
           git clone --single-branch --branch gh-pages "https://${{ secrets.TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" tmprepo
           cd tmprepo
-          if [ -d $path_export ]; then
-            echo "Directory ${path_export} already exists. Removing the directory."
-            git rm -r $path_export
-            git commit -m "Old directory ${path_export} deleted."
-          fi
-          if [ -d $path_export_canvas ]; then
-            echo "Directory ${path_export_canvas} already exists. Removing the directory."
-            git rm -r $path_export_canvas
-            git commit -m "Old directory ${path_export_canvas} deleted."
-          fi
+          git rm -r *
+          git commit -m "Old directory ${path_export} deleted."
 
           cd ${path_repo}
           cp -r $path_export/* tmprepo/
