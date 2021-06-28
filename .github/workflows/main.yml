@@ -56,7 +56,7 @@ jobs:
           echo ""
           echo "R directory size:"
           du -sh ${{ env.R_LIBS_USER }}
-      - name: Check hugo status
+      - name: Hugo setup and status
         run: |
           Rscript -e 'blogdown::install_hugo()'
           Rscript -e 'blogdown::config_Rprofile()'
