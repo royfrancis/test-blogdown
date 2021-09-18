@@ -1,4 +1,5 @@
-baseurl: https://royfrancis.github.io/testhugo/
+baseurl: /
+relativeURLs: true
 publishDir: docs
 languageCode: en-us
 title: A Hugo website
