@@ -64,6 +64,17 @@ jobs:
           Rscript -e 'blogdown::check_hugo()'
           echo ""
           Rscript -e 'blogdown::check_site()'
+      - name: Build site
+        run: |
+          # Render website
+          echo "Building website ..."
+          Rscript -e "blogdown::build_site()"
+          
+          # List folder contents
+          echo "Folder contents at $(pwd):"
+          ls -lh
+          echo "Folder contents at ${path_repo}/${path_export}:"
+          ls -lh ${path_repo}/${path_export}
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
